@@ -1,0 +1,71 @@
+CREATE TABLE IF NOT EXISTS Users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Papers (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+  title TEXT,
+  authors TEXT,
+  year INTEGER,
+  abstract TEXT,
+  pdf_path TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS PaperSections (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  section_name VARCHAR(255) NOT NULL,
+  page_start INTEGER,
+  page_end INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS PaperChunks (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  section_id INTEGER REFERENCES PaperSections(id) ON DELETE SET NULL,
+  page_number INTEGER,
+  text TEXT NOT NULL,
+  embedding_vector TEXT
+);
+
+CREATE TABLE IF NOT EXISTS PaperAnalysis (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER UNIQUE NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  problem_gap TEXT,
+  motivation TEXT,
+  hypothesis TEXT,
+  methodology TEXT,
+  main_finding TEXT,
+  limitations TEXT,
+  confidence_score NUMERIC(5,2)
+);
+
+CREATE TABLE IF NOT EXISTS Figures (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  caption TEXT,
+  page_number INTEGER,
+  image_path TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ChatMessages (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+  message TEXT NOT NULL,
+  role VARCHAR(20) NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS UserNotes (
+  id SERIAL PRIMARY KEY,
+  paper_id INTEGER NOT NULL REFERENCES Papers(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+  note_text TEXT NOT NULL,
+  page_number INTEGER
+);
