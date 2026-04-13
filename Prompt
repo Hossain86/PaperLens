@@ -1,0 +1,464 @@
+You are an expert full-stack engineer and AI architect.
+
+Your task is to build a production-grade web application called PaperLens.
+
+PaperLens is an AI-powered research paper reader that turns complex PDFs into structured explanations and answers the most important questions researchers ask when reading a paper.
+
+The system must be modular, scalable, and production-ready.
+
+---
+
+PROJECT GOAL
+
+Users upload a research paper PDF or provide a DOI/arXiv link.
+
+The system reads the paper using NLP and automatically extracts key insights and answers these questions:
+
+1. What is the specific problem or research gap?
+2. Why did the authors do this work?
+3. What is the main idea or hypothesis?
+4. How did they test it?
+5. What was the most important finding?
+6. What are the limitations?
+
+The system must also support chatting with the paper and show evidence from the original PDF.
+
+---
+
+TECH STACK
+
+Frontend
+React
+TypeScript
+TailwindCSS
+Vite
+
+Backend
+Python FastAPI
+
+Database
+PostgreSQL
+
+Vector Search
+FAISS or pgvector
+
+Authentication
+JWT
+
+PDF Parsing
+PyMuPDF
+
+Embeddings
+LLM embeddings API
+
+AI reasoning
+LLM completion API
+
+Deployment ready for
+Docker
+
+---
+
+PROJECT FOLDER STRUCTURE
+
+Generate a clean folder structure like this:
+
+/paperlens
+
+/frontend
+/src
+/components
+/pages
+/hooks
+/services
+/types
+/utils
+App.tsx
+main.tsx
+
+/backend
+/app
+/api
+/core
+/models
+/schemas
+/services
+/utils
+/workers
+
+main.py
+
+/database
+schema.sql
+
+/ai_pipeline
+paper_parser.py
+section_detector.py
+chunker.py
+embedding_generator.py
+paper_analyzer.py
+rag_engine.py
+
+/docker
+Dockerfile.backend
+Dockerfile.frontend
+docker-compose.yml
+
+---
+
+DATABASE SCHEMA
+
+Design SQL schema.
+
+Tables:
+
+Users
+
+id
+email
+password_hash
+created_at
+
+Papers
+
+id
+user_id
+title
+authors
+year
+abstract
+pdf_path
+created_at
+
+PaperSections
+
+id
+paper_id
+section_name
+page_start
+page_end
+
+PaperChunks
+
+id
+paper_id
+section_id
+page_number
+text
+embedding_vector
+
+PaperAnalysis
+
+id
+paper_id
+problem_gap
+motivation
+hypothesis
+methodology
+main_finding
+limitations
+confidence_score
+
+Figures
+
+id
+paper_id
+caption
+page_number
+image_path
+
+ChatMessages
+
+id
+paper_id
+user_id
+message
+role
+timestamp
+
+UserNotes
+
+id
+paper_id
+user_id
+note_text
+page_number
+
+---
+
+BACKEND API DESIGN
+
+Implement REST API endpoints:
+
+AUTH
+
+POST /auth/register
+POST /auth/login
+
+PAPER INGESTION
+
+POST /papers/upload
+Upload PDF
+
+POST /papers/import
+Import using DOI or arXiv
+
+GET /papers
+List user papers
+
+GET /papers/{paper_id}
+
+DELETE /papers/{paper_id}
+
+---
+
+PAPER ANALYSIS
+
+POST /analysis/run/{paper_id}
+
+GET /analysis/{paper_id}
+
+Returns:
+
+title
+authors
+year
+TLDR
+problem_gap
+motivation
+hypothesis
+methodology
+main_finding
+limitations
+confidence_score
+
+---
+
+CHAT WITH PAPER
+
+POST /chat/{paper_id}
+
+Input:
+
+user question
+
+Process:
+
+1 retrieve relevant chunks using embeddings
+2 send chunks to LLM
+3 generate answer with citations
+
+Return:
+
+answer
+cited_pages
+confidence
+
+---
+
+AI PIPELINE
+
+Implement these modules.
+
+paper_parser.py
+
+Extract PDF text using PyMuPDF
+Return text per page
+
+section_detector.py
+
+Identify sections
+
+Abstract
+Introduction
+Methods
+Results
+Discussion
+Conclusion
+
+Use heading detection heuristics.
+
+chunker.py
+
+Split paper into semantic chunks
+
+Keep metadata
+
+section_name
+page_number
+chunk_id
+
+embedding_generator.py
+
+Generate embeddings for each chunk.
+
+Store vectors in database.
+
+rag_engine.py
+
+When a user asks a question:
+
+1 embed question
+2 retrieve top chunks
+3 construct context
+4 generate answer with citations
+
+---
+
+STRUCTURED PAPER ANALYSIS
+
+paper_analyzer.py
+
+Run multiple prompts to extract:
+
+problem_gap
+motivation
+hypothesis
+methodology
+main_finding
+limitations
+
+Each prompt must return JSON.
+
+Example output:
+
+{
+problem_gap: "",
+motivation: "",
+hypothesis: "",
+methodology: "",
+main_finding: "",
+limitations: ""
+}
+
+---
+
+FRONTEND PAGES
+
+LandingPage
+
+Upload PDF
+Import DOI
+Recent papers
+
+PaperDashboard
+
+List of papers
+Search
+
+PaperReader
+
+Split layout
+
+Left
+paper outline
+
+Center
+paper viewer
+
+Right
+AI assistant
+
+---
+
+FRONTEND COMPONENTS
+
+UploadBox
+PaperCard
+SectionSidebar
+PDFViewer
+AnalysisCards
+ChatPanel
+CitationHighlight
+NotesPanel
+FigureViewer
+
+---
+
+ANALYSIS UI
+
+Show answers as cards.
+
+Card layout:
+
+Title
+Short answer
+Evidence snippet
+Page number
+Confidence badge
+
+---
+
+CHAT UI
+
+Chat messages with citations.
+
+Click citation
+scroll to page.
+
+---
+
+IMPORTANT LOGIC
+
+Never hallucinate facts.
+
+If information is missing return:
+
+"Not stated in the paper"
+
+Always include page citations.
+
+---
+
+MVP IMPLEMENTATION ORDER
+
+1 Build backend API
+2 Implement PDF ingestion
+3 Implement text extraction
+4 Implement section detection
+5 Implement chunk embeddings
+6 Implement analysis prompts
+7 Build React UI
+8 Implement chat RAG
+9 Add notes
+10 Add figures/tables
+
+---
+
+EXTRA FEATURES FOR FUTURE
+
+multi paper comparison
+
+flashcard generation
+
+presentation slide generator
+
+research map
+
+citation network graph
+
+---
+
+DELIVERABLES
+
+Generate:
+
+complete folder structure
+
+backend code
+
+frontend code
+
+database schema
+
+docker setup
+
+AI pipeline scripts
+
+API integration
+
+error handling
+
+loading states
+
+clean comments in code
